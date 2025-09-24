@@ -3,8 +3,8 @@ class UserRepository:
     def fetch_users(self):
         return [
             {"id": 1, "name": "Alice"},
-            {"id": 2, "name": "Bob"},   # corregí "Bod" → "Bob"
-            {"id": 3, "name": "Charlie"}
+            {"id": 2, "name": "Bob"},
+            {"id": 3, "name": "Rafa"}
         ]
 
     def get_user(self, user_id: int):
