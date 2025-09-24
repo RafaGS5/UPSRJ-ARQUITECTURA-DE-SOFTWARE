@@ -1,35 +1,26 @@
-class LocalUserRepository:
-    """
-    Capa de acceso a datos.
-    Aquí simulamos una base de datos con una lista en memoria.
-    """
-    def get_all_users(self):
-        return [
-            {"id": 1, "name": "Alice"},
-            {"id": 2, "name": "Bob"},
-            {"id": 3, "name": "Charlie"}
-        ]
+# entity_server.py
 
-    def find_user_by_id(self, user_id):
-        return next((u for u in self.get_all_users() if u["id"] == user_id), None)
+class UserRepository:
+    def get_all(self):
+        return [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bod"}]
 
-    def search_users(self, keyword):
-        return [u for u in self.get_all_users() if keyword.lower() in u["name"].lower()]
+    def find_by_id(self, user_id):
+        return next((u for u in self.get_all() if u["id"] == user_id), None)
+
+    def get_by_keyword(self, keyword):
+        return [u for u in self.get_all() if keyword.lower() in u["name"].lower()]
 
 
-class UserService:
-    """
-    Capa de negocio.
-    Usa el repositorio y expone métodos que serán utilizados por los controladores (routes).
-    """
-    def __init__(self, repository: LocalUserRepository):
+class EntityService:
+    def __init__(self, repository: UserRepository):
         self.repository = repository
 
-    def list_users(self):
-        return self.repository.get_all_users()
+    # Estos métodos deben existir para pasar los tests
+    def get_all(self):
+        return self.repository.get_all()
 
-    def get_user(self, user_id):
-        return self.repository.find_user_by_id(user_id)
+    def find_by_id(self, user_id):
+        return self.repository.find_by_id(user_id)
 
-    def filter_users(self, keyword):
-        return self.repository.search_users(keyword)
+    def get_by_keyword(self, keyword):
+        return self.repository.get_by_keyword(keyword)
