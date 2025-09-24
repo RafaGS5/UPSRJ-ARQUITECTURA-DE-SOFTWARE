@@ -1,3 +1,5 @@
+# entity_server.py
+
 class UserRepository:
     def get_all(self):
         return [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bod"}]
