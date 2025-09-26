@@ -50,3 +50,12 @@ class EntityService:
     def get_groups_for_user(self, user_id: int):
         plog("Retrieving groups with user id", INFO)
         return self.repository.get_groups_for_user(user_id=user_id)
+    
+
+    def get_all(self):
+        """Retrieve all entities from the repository"""
+        return self.repository.get_all()
+
+    def get_by_keyword(self, keyword: str):
+        """Retrieve an entity by keyword"""
+        return self.repository.get_by_keyword(keyword)
