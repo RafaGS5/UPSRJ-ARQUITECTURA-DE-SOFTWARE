@@ -26,14 +26,13 @@ jobs:
         python-version: '3.11'
 
     - name: Instalar dependencias
-      run: |
-        pip install -r requirements.txt
+      run: pip install -r requirements.txt
 
     - name: Clonar repositorio de evaluación
       run: git clone https://chucholoport:${{ secrets.AUTOGRADE_PAT }}@github.com/chucholoport/autograde-core.git
-
+    
     - name: Ejecutar pruebas
       working-directory: autograde-core
       run: |
-      
+        export PYTHONPATH=$PYTHONPATH:.. 
         pytest ARQUITECTURA-DE-SOFTWARE/01_basic_concepts/test_app.py

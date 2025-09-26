@@ -1,37 +1,57 @@
-from flask import Blueprint, render_template, request
-from logging import INFO
-from py_utils.logger import plog
+from flask import Flask, jsonify, request, render_template
+# Adjust the import path to include the parent directory for py_utils
+import sys
+import os
+from logging import DEBUG, INFO, WARNING, ERROR
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from py_utils.logger import set_logging, plog
 
-# Importamos la lógica de negocio
-from ..server.user_service import UserService, LocalUserRepository
+from exercises.basic_concepts.repository.user_repository import UserRepository
+from exercises.basic_concepts.repository.group_repository import GroupRepository
 
-# Definimos un Blueprint en lugar de una app completa
-bp = Blueprint("routes", __name__)
+from exercises.basic_concepts.service.entity_service import EntityService
 
-# Instanciamos el servicio real
-user_service = UserService(LocalUserRepository())
+app = Flask(__name__, template_folder="../templates")
+user_repository = UserRepository()
+group_repository = GroupRepository()
 
-@bp.route("/")
-def index():
+user_service = EntityService(user_repository)
+group_service = EntityService(group_repository)
+
+@app.route("/users")
+def get_users():
+    """HTTP endpoint that returns a JSON list of users."""
+    plog("Received request for /users endpoint", INFO)
+    users = user_service.list_users()
+    return jsonify(users)
+
+@app.route("/groups")
+def get_groups():
+    """HTTP endpoint that returns a JSON list of groups."""
+    plog("Received request for /users endpoint", INFO)
+    groups = group_service.list_groups()
+    return jsonify(groups)
+
+@app.route('/', methods=['GET'])
+def home():
+    """Render the user search form."""
     return render_template("search.html")
 
-@bp.route("/users")
-def get_users():
-    plog("Fetching all users", INFO)
-    users = user_service.list_users()
-    return render_template("result.html", users=users)
-
-@bp.route("/users/<int:user_id>")
-def get_user(user_id):
-    plog(f"Fetching user with ID {user_id}", INFO)
-    user = user_service.get_user(user_id)
-    if not user:
-        return render_template("error.html", message="Usuario no encontrado"), 404
-    return render_template("result.html", users=[user])
-
-@bp.route("/search")
+@app.route('/search', methods=['POST'])
 def search():
-    keyword = request.args.get("q", "")
-    plog(f"Searching users with keyword: {keyword}", INFO)
-    results = user_service.filter_users(keyword)
-    return render_template("result.html", users=results)
+    #requested_service_repo = request.form.get("repo")
+    requested_service_id = request.form.get("id")
+    requested_service_keyword = request.form.get("keyword")
+    
+    if requested_service_id:
+        user = user_service.get_by_id(requested_service_id)
+    elif requested_service_keyword:
+        user = user_service.get_by_keyword(requested_service_keyword)
+    
+    if not user:
+        plog(f"User not found.", ERROR)
+        return render_template("error.html")
+    else:
+        plog(f"User found: {user['name']}.", DEBUG)
+        return render_template("result.html", user=user) 
+

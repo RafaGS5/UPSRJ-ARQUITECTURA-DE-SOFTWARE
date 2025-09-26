@@ -8,16 +8,24 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from py_utils.logger import set_logging, plog
 
 # Interfaz del repositorio (bajo acoplamiento)
-class UserRepository(ABC):
+class EntityRepository(ABC):
     
     @abstractmethod
     def get_all(self) -> list:
         pass
-    
+        
     @abstractmethod
     def get_by_keyword(self, keyword: str) -> Optional[dict]:
         pass
     
     @abstractmethod
     def get_by_id(self, id: int) -> Optional[dict]:
+        pass
+    
+    @abstractmethod
+    def get_users_for_group(self, group_id):
+        pass
+    
+    @abstractmethod
+    def get_groups_for_user(self, user_id):
         pass
