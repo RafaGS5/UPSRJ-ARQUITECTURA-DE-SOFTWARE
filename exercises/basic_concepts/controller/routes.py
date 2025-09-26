@@ -11,8 +11,11 @@ from exercises.basic_concepts.repository.group_repository import GroupRepository
 
 from flask import Blueprint, render_template, request
 from exercises.basic_concepts.service.entity_service import EntityService
+from flask import jsonify
+from exercises.basic_concepts.repository.user_repository import UserRepository
 
 bp = Blueprint("routes", __name__)
+routes = Blueprint("routes", __name__)
 
 app = Flask(__name__, template_folder="../templates")
 user_repository = UserRepository()
@@ -21,6 +24,11 @@ group_repository = GroupRepository()
 user_service = EntityService(user_repository)
 group_service = EntityService(group_repository)
 
+
+@routes.route("/users", methods=["GET"])
+def get_users():
+    users = UserRepository().get_all()
+    return jsonify(users), 200
 
 
 
