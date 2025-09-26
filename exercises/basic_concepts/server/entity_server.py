@@ -59,3 +59,7 @@ class EntityService:
     def get_by_keyword(self, keyword: str):
         """Retrieve an entity by keyword"""
         return self.repository.get_by_keyword(keyword)
+    
+    def find_by_id(self, id: int):
+        plog("Retrieving user with id", INFO)
+        return self.repository.get_by_id(id=id)
