@@ -5,12 +5,10 @@ import os
 from logging import DEBUG, INFO, WARNING, ERROR
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from py_utils.logger import set_logging, plog
-
+from exercises.basic_concepts.service.entity_service import EntityService
 from exercises.basic_concepts.repository.user_repository import UserRepository
 from exercises.basic_concepts.repository.group_repository import GroupRepository
-
 from flask import Blueprint, render_template, request
-from exercises.basic_concepts.service.entity_service import EntityService
 from flask import jsonify
 from exercises.basic_concepts.repository.user_repository import UserRepository
 
@@ -25,9 +23,9 @@ user_service = EntityService(user_repository)
 group_service = EntityService(group_repository)
 
 
-@routes.route("/users", methods=["GET"])
-def get_users():
-    users = UserRepository().get_all()
+@routes.route("/users")
+def users():
+    users = user_service.get_all()
     return jsonify(users), 200
 
 
