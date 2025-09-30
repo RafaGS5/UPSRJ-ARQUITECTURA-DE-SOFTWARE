@@ -1,31 +1,25 @@
 from abc import ABC, abstractmethod
-from typing import Optional
-# Adjust the import path to include the parent directory for py_utils
-import sys
-import os
-from logging import DEBUG, INFO, WARNING, ERROR
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-from py_utils.logger import set_logging, plog
+from typing import Optional, List, Dict
 
-# Interfaz del repositorio (bajo acoplamiento)
 class EntityRepository(ABC):
-    
+    """Interfaz base que debe implementar cualquier repositorio de entidad."""
+
     @abstractmethod
-    def get_all(self) -> list:
+    def get_all(self) -> List[Dict]:
         pass
-        
+
     @abstractmethod
-    def get_by_keyword(self, keyword: str) -> Optional[dict]:
+    def get_by_keyword(self, keyword: str) -> Optional[Dict]:
         pass
-    
+
     @abstractmethod
-    def get_by_id(self, id: int) -> Optional[dict]:
+    def get_by_id(self, id: int) -> Optional[Dict]:
         pass
-    
+
     @abstractmethod
-    def get_users_for_group(self, group_id):
+    def get_users_for_group(self, group_id: int) -> List[Dict]:
         pass
-    
+
     @abstractmethod
-    def get_groups_for_user(self, user_id):
+    def get_groups_for_user(self, user_id: int) -> List[Dict]:
         pass

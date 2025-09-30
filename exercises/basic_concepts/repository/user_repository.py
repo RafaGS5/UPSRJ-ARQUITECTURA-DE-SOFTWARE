@@ -1,128 +1,52 @@
 import json
 import os
-from logging import DEBUG
-try:
-    from py_utils.logger import plog
-except Exception:
-    def plog(msg, level=DEBUG):
-        print(msg)
+from typing import Optional, List, Dict
+from exercises.basic_concepts.repository.interface import EntityRepository
 
-class UserRepository:
-    def __init__(self):
-        base = os.path.dirname(__file__)
-        self.users_file = os.path.join(base, "users.json")
-        self.groups_file = os.path.join(base, "groups.json")
-        self.memberships_file = os.path.join(base, "memberships.json")
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-    def _read_json(self, path):
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except FileNotFoundError:
-            plog(f"File not found: {path}", DEBUG)
-            return []
-        except Exception as e:
-            plog(f"Error reading {path}: {e}", DEBUG)
-            return []
+class UserRepository(EntityRepository):
+    """Repositorio para usuarios (implementa EntityRepository)."""
 
-    def get_all(self):
-        return self._read_json(self.users_file)
+    def _users_path(self):
+        return os.path.join(BASE_DIR, 'repository', 'users.json') if False else os.path.join(os.path.dirname(__file__), 'users.json')
 
-    def get_by_id(self, id):
-        try:
-            id_int = int(id)
-        except Exception:
-            return None
-        for u in self.get_all():
-            try:
-                if int(u.get("id")) == id_int:
-                    return u
-            except Exception:
-                continue
-        return None
+    def _groups_path(self):
+        return os.path.join(os.path.dirname(__file__), 'groups.json')
 
-    def get_by_keyword(self, keyword: str):
-        if not keyword:
-            return None
-        kw = keyword.lower()
-        for u in self.get_all():
-            name = str(u.get("name", "")).lower()
-            email = str(u.get("email", "")).lower()
-            if kw in name or kw in email:
+    def get_all(self) -> List[Dict]:
+        path = os.path.join(os.path.dirname(__file__), 'users.json')
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+
+    def get_by_keyword(self, keyword: str) -> Optional[Dict]:
+        users = self.get_all()
+        key = keyword.strip().lower()
+        for u in users:
+            if str(u.get('id')) == key or u.get('name', '').lower() == key:
                 return u
         return None
 
-    # 🔹 devuelve todos los usuarios de un grupo
-    def get_users_for_group(self, group_id):
+    def get_by_id(self, id: int) -> Optional[Dict]:
         users = self.get_all()
-        groups = self._read_json(self.groups_file)
-        memberships = self._read_json(self.memberships_file)
-
-        gid = int(group_id)
-        result = []
-
-        # Caso 1: revisar memberships.json
-        if memberships:
-            user_ids = [int(m["user_id"]) for m in memberships if int(m["group_id"]) == gid]
-            result = [u for u in users if int(u.get("id")) in user_ids]
-            if result:
-                return result
-
-        # Caso 2: revisar groups.json con campo members
-        for g in groups:
-            if int(g.get("id")) == gid:
-                members = g.get("members") or g.get("user_ids") or []
-                try:
-                    member_ids = [int(x) for x in members]
-                except Exception:
-                    member_ids = [int(x) for x in members if str(x).isdigit()]
-                result = [u for u in users if int(u.get("id")) in member_ids]
-                return result
-
-        # Caso 3: revisar users.json con campo groups
         for u in users:
-            ug = u.get("groups") or []
-            try:
-                if any(int(gid) == int(x) for x in ug):
-                    result.append(u)
-            except Exception:
-                continue
-        return result
+            if int(u.get('id')) == int(id):
+                return u
+        return None
 
-    # 🔹 devuelve todos los grupos de un usuario
-    def get_groups_for_user(self, user_id):
-        groups = self._read_json(self.groups_file)
-        memberships = self._read_json(self.memberships_file)
-        user = self.get_by_id(user_id)
-        if not user:
+    def get_users_for_group(self, group_id: int) -> List[Dict]:
+        # Not primary responsibility of UserRepository, but implement safe fallback
+        users = self.get_all()
+        gid = int(group_id)
+        return [u for u in users if gid in u.get('groups', [])]
+
+    def get_groups_for_user(self, user_id: int) -> List[Dict]:
+        # Read groups.json and return groups that contain this user id
+        path = os.path.join(os.path.dirname(__file__), 'groups.json')
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                groups = json.load(f)
+        except FileNotFoundError:
             return []
-
         uid = int(user_id)
-
-        # Caso 1: revisar campo "groups" en el usuario
-        if user.get("groups"):
-            try:
-                gids = [int(x) for x in user["groups"]]
-            except Exception:
-                gids = [int(x) for x in user["groups"] if str(x).isdigit()]
-            return [g for g in groups if int(g.get("id")) in gids]
-
-        # Caso 2: revisar memberships.json
-        if memberships:
-            try:
-                gids = [int(m["group_id"]) for m in memberships if int(m["user_id"]) == uid]
-                return [g for g in groups if int(g.get("id")) in gids]
-            except Exception:
-                pass
-
-        # Caso 3: revisar campo members en cada grupo
-        result = []
-        for g in groups:
-            members = g.get("members") or g.get("user_ids") or []
-            try:
-                if any(int(x) == uid for x in members):
-                    result.append(g)
-            except Exception:
-                continue
-        return result
-
+        return [g for g in groups if uid in g.get('members', [])]

@@ -1,69 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Error</title>
-    <style>
-        body {
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7f9fc;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
-
-        header {
-            background-color: #c0392b;
-            color: white;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        main {
-            max-width: 600px;
-            margin: 4rem auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
-            text-align: center;
-        }
-
-        h1 {
-            color: #c0392b;
-            margin-bottom: 1rem;
-        }
-
-        p {
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-        }
-
-        a {
-            display: inline-block;
-            padding: 0.8rem 1.5rem;
-            background-color: #2980b9;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-
-        a:hover {
-            background-color: #1f6391;
-        }
-    </style>
+  <meta charset="utf-8">
+  <title>Error</title>
 </head>
 <body>
-    <header>
-        <h2>Error en la búsqueda</h2>
-    </header>
-
-    <main>
-        <h1>⚠️ No se encontró resultado</h1>
-        <p>{{ message }}</p>
-        <a href="/search">🔍 Volver a la búsqueda</a>
-    </main>
+  <h1>Error</h1>
+  <p>{{ message }}</p>
+  <p><a href="/search">Volver</a></p>
 </body>
 </html>
